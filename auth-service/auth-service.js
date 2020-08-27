@@ -1,4 +1,12 @@
-const fastify = require('fastify')()
+const fastify = require('fastify')({
+  logger: true,
+})
+
+fastify.register(require('fastify-cors'), {
+  origin: true,
+  credentials: true
+})
+
 fastify.register(require('fastify-jwt'), {
   secret: 'supersecret'
 })

@@ -1,5 +1,12 @@
-const fastify = require('fastify')()
-fastify.register(require('fastify-cors'), {})
+const fastify = require('fastify')({
+  loggger: true,
+})
+
+fastify.register(require('fastify-cors'), {
+  origin: true,
+  credentials: true,
+})
+
 fastify.register(require('fastify-jwt'), {
   secret: 'supersecret'
 })
@@ -7,9 +14,8 @@ fastify.register(require('fastify-jwt'), {
 fastify.get("/authenticate", async function (req, reply) {
   try {
     await fastify.jwt.verify(req.query.token)
-    reply.send(fastify.jwt.sign({username: fastify.jwt.decode(req.query.token).username, role: 'admin'}, {
-      expiresIn: '1d'
-    }))
+    const payload = {username: fastify.jwt.decode(req.query.token).username, role: 'admin'}
+    reply.send({token: fastify.jwt.sign(payload, {expiresIn: '1d'})})
   } catch (err) {
     reply.send(err)
   }
