@@ -34,7 +34,7 @@ fastify.after(() => {
       try {
         await fastify.jwt.verify(req.query.token)
         const token = fastify.jwt.sign({ username: req.username }, {
-          expiresIn: '30s'
+          expiresIn: '15s'
         })
         let info = fastify.jwt.decode(req.query.token)
         reply.redirect(info.redirect + '?token=' + token)

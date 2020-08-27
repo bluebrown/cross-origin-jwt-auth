@@ -15,7 +15,7 @@ fastify.get("/authenticate", async function (req, reply) {
   try {
     await fastify.jwt.verify(req.query.token)
     const payload = { username: fastify.jwt.decode(req.query.token).username, role: 'admin' }
-    reply.send({ token: fastify.jwt.sign(payload, { expiresIn: '1m' }) })
+    reply.send({ token: fastify.jwt.sign(payload, { expiresIn: '30m' }) })
   } catch (err) {
     reply.send(err)
   }
@@ -23,7 +23,7 @@ fastify.get("/authenticate", async function (req, reply) {
 
 fastify.get("/login", async (req, reply) => {
   const token = fastify.jwt.sign({ redirect: 'http://localhost:5000/authenticate' }, {
-    expiresIn: '30s'
+    expiresIn: '15s'
   })
   reply.redirect('http://localhost:4000/login?token=' + token)
 })
