@@ -1,6 +1,6 @@
 # JWT Exchange Authentication
 
-This repository contains three separate applications. A rest API, an application serve that hosts a static web page, and an authentication service.
+This repository contains three separate applications. A rest API, an application server that hosts a static web page, and an authentication service.
 
 In order to retrieve data from the API, a valid JWT has to be included as bearer authorization header. To get this token the requester must authenticate against the authentication service.
 
