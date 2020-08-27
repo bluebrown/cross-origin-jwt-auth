@@ -32,7 +32,6 @@ fastify.register((fastify, options, done) => {
   fastify.addHook("onRequest", async (req, reply) => {
     try {
       console.log('secret', fastify.jwt.secret);
-      fastify.jwt.secret = 'bogus'
       await req.jwtVerify()
     } catch (err) {
       reply.send(err)
