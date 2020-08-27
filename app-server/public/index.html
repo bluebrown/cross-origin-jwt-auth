@@ -1,27 +1,67 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Document</title>
+  <link href="https://unpkg.com/tailwindcss@^1.0/dist/tailwind.min.css" rel="stylesheet">
+
 </head>
-<body>
-  
+
+<body class="bg-gray-200 h-screen w-screen p-3">
+
+  <ul class="flex -mx-1 mb-4">
+    <li class="px-1"><button onclick="fetchData(event)"
+        class="px-3 py-1 text-lg rounded-sm bg-blue-600 hover:bg-blue-500 text-white border focus:outline-none focus:shadow-outline">
+        Fetch Data
+      </button></li>
+    <li class="px-1"><button onclick="login(event)"
+        class="px-3 py-1 text-lg rounded-sm bg-green-600 hover:bg-green-500 text-white border focus:outline-none focus:shadow-outline">
+        Login
+      </button></li>
+  </ul>
+
+  <div id="output" class="w-full max-w-xl rounded-md shadow-md bg-white p-3 h-48  break-all"></div>
+
   <script>
-    (async (base) => {
-        let res = await fetch(base + '/api', {
+
+    const aux = (caption, message) => document.getElementById('output').innerHTML =
+      `<h1 class="font-semibold text-sm mb-2">${caption}</h1>
+    <p>${message}</p>`
+
+    const baseURL = 'http://localhost:5000'
+    function fetchData() {
+      (async (base) => {
+        if (sessionStorage.token) {
+          let res = await fetch(base + '/api', {
+            headers: { 'Authorization': 'Bearer ' + sessionStorage.token }
+          })
+          if (!res.ok) {
+            return aux('Problem:', 'issues with token, the token may be expired')
+          }
+          const userInfo = await res.text()
+          aux('User Data:', userInfo)
+        } else {
+          aux('Problem', 'no token in session')
+        }
+      })(baseURL).catch((err) => aux('Error:', err.message))
+    }
+
+    function login() {
+      (async (base) => {
+        let res = await fetch(base + '/login', {
           credentials: 'include'
         })
-        const {token} = await res.json()
+        const { token } = await res.json()
+        if (!token) {
+          return aux('Problem', 'no valid token received')
+        }
         sessionStorage.setItem('token', token)
-        res = await fetch(base+'/api', {
-          headers: {'Authorization': 'Bearer '+ sessionStorage.token}
-        })
-        document.body.append(Object.assign(document.createElement('p'), {
-          textContent: await res.text(),
-          style: 'font-size: 2rem;'
-        }))
-    })('http://localhost:5000').catch(console.warn)
+        aux('Token Received:', sessionStorage.token)
+      })(baseURL).catch((err) => aux('Error:', err.message))
+    }
   </script>
 </body>
+
 </html>
