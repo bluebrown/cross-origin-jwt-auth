@@ -8,7 +8,7 @@ fastify.register(require('fastify-cors'), {
 })
 
 fastify.register(require('fastify-jwt'), {
-  secret: 'supersecret'
+  secret: require('./secret-provider')
 })
 
 fastify.decorateRequest('username', '')
@@ -30,17 +30,15 @@ fastify.after(() => {
     method: 'GET',
     url: '/login',
     onRequest: fastify.basicAuth,
-    handler: async (req, reply) => {
-      try {
-        await fastify.jwt.verify(req.query.token)
-        const token = fastify.jwt.sign({ username: req.username }, {
-          expiresIn: '15s'
+    handler: (req, reply, next) => {
+      req.headers.authorization = 'Bearer ' + req.query.token
+      req.jwtVerify(function (err, decoded) {
+        if (err) return reply.send(err)
+        reply.jwtSign({ username: req.username }, function (err, token) {
+          if (err) return reply.send(err)
+          reply.redirect(decoded.redirect + '?token=' + token)
         })
-        let info = fastify.jwt.decode(req.query.token)
-        reply.redirect(info.redirect + '?token=' + token)
-      } catch (err) {
-        reply.send(err)
-      }
+      })
     }
   })
 })

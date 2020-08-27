@@ -25,12 +25,14 @@ fastify.get("/login", async (req, reply) => {
   const token = fastify.jwt.sign({ redirect: 'http://localhost:5000/authenticate' }, {
     expiresIn: '15s'
   })
-  reply.redirect('http://localhost:4000/login?token=' + token)
+  reply.redirect('http://localhost:4000/login?applicationID=testAPI&token=' + token)
 })
 
 fastify.register((fastify, options, done) => {
   fastify.addHook("onRequest", async (req, reply) => {
     try {
+      console.log('secret', fastify.jwt.secret);
+      fastify.jwt.secret = 'bogus'
       await req.jwtVerify()
     } catch (err) {
       reply.send(err)
