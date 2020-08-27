@@ -1,5 +1,5 @@
 const fastify = require('fastify')({
-  loggger: true,
+  logger: true,
 })
 
 fastify.register(require('fastify-cors'), {
